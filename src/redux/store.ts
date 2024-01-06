@@ -4,7 +4,7 @@ import userReducer from "./reducers/user.reducer";
 import themeReducer from "./reducers/theme.reducer";
 import sidebarReducer from "./reducers/sidebar.reducer";
 import workReducer from "./reducers/work.reducer";
-import { auth } from "./api/auth/auth";
+import { auth } from "./api/auth.api";
 import { workApi } from "./api/work.api";
 import { userApi } from "./api/user.api";
 import { responseMiddleware } from "./middleware/responseMiddleware";

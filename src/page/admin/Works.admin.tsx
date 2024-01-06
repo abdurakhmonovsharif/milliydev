@@ -9,12 +9,10 @@ const Works = () => {
   const isEditing = path === "edit" && id !== "";
 
   useEffect(() => {
-    // Check if not in editing mode, navigate to work list
     if (!isEditing) {
       navigate("/admin/works/list");
-    }    
-  }, [isEditing, navigate]);
-
+    }
+  }, [isEditing, window.location.pathname]);
   return (
     <div className='overflow-y-auto h-[calc(100vh-85px)]'>
       <Outlet />

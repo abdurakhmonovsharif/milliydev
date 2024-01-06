@@ -1,4 +1,5 @@
 import {
+  Navigate,
   RouterProvider,
   createBrowserRouter,
 } from "react-router-dom";
@@ -8,15 +9,18 @@ import HeroSection from "./layout/HeroSection";
 import HeroMiniAboutMe from "./layout/HeroMiniAboutMe";
 import HeroExperience from "./layout/HeroExperience";
 import HeroWorks from "./layout/HeroWorks";
-import Admin from "./page/admin/Home.admin";
 import Works from "./page/admin/Works.admin";
 import Settings from "./page/admin/Settings.admin";
 import WorksActions from "./page/admin/Works.create.admin";
 import WorksList from "./page/admin/Works.lists.admin";
 import Login from "./page/auth/Login";
-
-
+import React, { Suspense } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "./redux/store";
+const Admin = React.lazy(() => import("./page/admin/Home.admin"))
 const Route = () => {
+  const user_token = localStorage.getItem("user_token");
+  const user = useSelector((state: RootState) => state.user);
   const routes = createBrowserRouter([
     {
       path: "/",
@@ -45,7 +49,9 @@ const Route = () => {
     },
     {
       path: "/admin",
-      element: <Admin/>,
+      element: user.auth || user_token ? <Suspense fallback={"...Loading"}>
+        <Admin />
+      </Suspense> : <Navigate to={'/login'} />,
       children: [
         {
           path: "/admin/works",
@@ -68,7 +74,6 @@ const Route = () => {
       ],
     },
   ]);
-
   return <RouterProvider fallbackElement={<Login />} router={routes} />;
 };
 

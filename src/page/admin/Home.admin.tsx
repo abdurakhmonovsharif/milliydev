@@ -3,7 +3,7 @@ import { setDark } from "../../redux/reducers/theme.reducer";
 import { RootState } from "../../redux/store";
 import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar.admin";
-import {  Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { setSidebarOpen } from "../../redux/reducers/sidebar.reducer";
 import {
   MenuIconBlack,
@@ -18,35 +18,35 @@ import { useGetWorksByCaptionQuery } from "../../redux/api/work.api";
 import { clearAll, setWorkState } from "../../redux/reducers/work.reducer";
 import { useGetMeQuery } from "../../redux/api/user.api";
 import { setUser } from "../../redux/reducers/user.reducer";
-
 const Admin = () => {
   useTitle("Admin");
-  const user = useSelector((state: RootState) => state.user);
+  const l_auth = localStorage.getItem("user_token");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { dark } = useSelector((state: RootState) => state.theme);
+  const { auth } = useSelector((state: RootState) => state.user);
   const { open } = useSelector((state: RootState) => state.sidebar);
-  const { data: userData, isLoading } = useGetMeQuery(undefined,{skip:user.auth});
+  const { data: userData, isLoading } = useGetMeQuery(undefined, { skip: !(l_auth != null && auth == false) });
   const workState = useSelector((state: RootState) => state.work);
   useEffect(() => {
     if (userData) {
-    dispatch(setUser({user:userData.data,auth:true}))
-    }    
+      dispatch(setUser({ user: userData.data, auth: true }))
+    }
   }, [isLoading]);
-  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
   useEffect(() => {
-  location.pathname === "/admin" && navigate("/admin/works");
+    location.pathname === "/admin" && navigate("/admin/works");
     const dark_localstorege = localStorage.getItem("dark") || false;
     dispatch(
       setDark(
         dark_localstorege === "true"
           ? true
           : dark_localstorege == "false"
-          ? false
-          : false
+            ? false
+            : false
       )
     );
   }, []);
@@ -89,6 +89,9 @@ const Admin = () => {
   );
 
   useEffect(() => {
+    dispatchWorkState()
+  }, [isFetching]);
+  const dispatchWorkState = () => {
     if (workData)
       dispatch(
         setWorkState({
@@ -97,7 +100,7 @@ const Admin = () => {
           isLoadingSearch: false,
         })
       );
-  }, [isFetching]);
+  }
   return (
     <main className={`${dark && "dark"} flex justify-between bg-default-50`}>
       <Sidebar />

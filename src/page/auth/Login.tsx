@@ -1,16 +1,17 @@
-import { Button, Image, Input } from "@nextui-org/react";
+import { Button, CircularProgress, Image, Input } from "@nextui-org/react";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../../helpers/Icons";
-import React from "react";
-import { useLoginMutation } from "../../redux/api/auth/auth";
+import React, { useEffect } from "react";
+import { useLoginMutation } from "../../redux/api/auth.api";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../redux/reducers/user.reducer";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
+import { toast } from "react-toastify";
 
 const Login = () => {
-  const user=useSelector((state:RootState)=>state.user);
+  const user = useSelector((state: RootState) => state.user);
   const [isVisible, setIsVisible] = React.useState(false);
-  const [loginAccount] = useLoginMutation();
+  const [loginAccount, { isLoading, error }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -28,13 +29,24 @@ const Login = () => {
     };
     try {
       const result: any = await loginAccount(loginUser);
-      localStorage.setItem("user_token", result.data.token);
-      dispatch(setUser({...user,auth:true}))
-      navigate("/admin");
+      if (!result.error) {
+        localStorage.setItem("user_token", result.data.token);
+        dispatch(setUser({ ...user, auth: true }))
+        navigate("/admin");
+      }
     } catch (err) {
       console.error("Login Error:", err);
     }
   };
+  const notify = (message: string) => toast.error(message);
+  useEffect(() => {
+    if (error != undefined) {
+      if ('data' in error && error.data != undefined) {
+        let { message }: any = error.data
+        notify(message);
+      }
+    }
+  }, [error]);
   return (
     <div className="flex items-center justify-center w-full h-screen">
       <form
@@ -54,7 +66,7 @@ const Login = () => {
           name="username"
           variant="bordered"
           placeholder="Enter your username"
-          onClear={() => console.log("input cleared")}
+
           className="max-w-lg"
         />
         <Input
@@ -81,7 +93,11 @@ const Login = () => {
           type="submit"
           variant="shadow"
           className="bg-global_purpe text-white w-full text-lg font-medium">
-          Login
+          {
+            isLoading ? <div className="p-2">
+              <CircularProgress color="default" size="sm" aria-label="Loading..." />
+            </div> : "Login"
+          }
         </Button>
       </form>
     </div>
