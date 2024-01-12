@@ -14,10 +14,8 @@ import {
 } from "../../helpers/Icons";
 import { Button, Input } from "@nextui-org/react";
 import { useTitle } from "../../helpers/useTitle";
-import { useGetWorksByCaptionQuery } from "../../redux/api/work.api";
 import { clearAll, setWorkState } from "../../redux/reducers/work.reducer";
-import { useGetMeQuery } from "../../redux/api/user.api";
-import { setUser } from "../../redux/reducers/user.reducer";
+import { useGetWorkByCaptionQuery } from "../../redux/api/work.api";
 const Admin = () => {
   useTitle("Admin");
   const l_auth = localStorage.getItem("user_token");
@@ -26,13 +24,7 @@ const Admin = () => {
   const { dark } = useSelector((state: RootState) => state.theme);
   const { auth } = useSelector((state: RootState) => state.user);
   const { open } = useSelector((state: RootState) => state.sidebar);
-  const { data: userData, isLoading } = useGetMeQuery(undefined, { skip: !(l_auth != null && auth == false) });
   const workState = useSelector((state: RootState) => state.work);
-  useEffect(() => {
-    if (userData) {
-      dispatch(setUser({ user: userData.data, auth: true }))
-    }
-  }, [isLoading]);
   const [searchValue, setSearchValue] = useState("");
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
@@ -57,6 +49,7 @@ const Admin = () => {
     dispatch(setDark(!dark));
     localStorage.setItem("dark", JSON.stringify(!dark));
   };
+  const { data: workData, isLoading, isFetching } = useGetWorkByCaptionQuery({ caption: searchValue }, { skip: searchValue == "" })
   const handleSearch = (e: React.FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     if (value.trim() === "") {
@@ -69,7 +62,7 @@ const Admin = () => {
     dispatch(
       setWorkState({
         ...workState,
-        isSearching: !!value,
+        isSearching: value !== "",
         isLoadingSearch: true,
       })
     );
@@ -83,10 +76,6 @@ const Admin = () => {
 
     setSearchTimeout(newTimeout);
   };
-  const { data: workData, isFetching } = useGetWorksByCaptionQuery(
-    { caption: searchValue },
-    { skip: searchValue == "" }
-  );
 
   useEffect(() => {
     dispatchWorkState()
@@ -96,7 +85,7 @@ const Admin = () => {
       dispatch(
         setWorkState({
           ...workState,
-          searchedWorks: workData?.data,
+          searchedWorks: workData,
           isLoadingSearch: false,
         })
       );
