@@ -29,9 +29,9 @@ const WorksActions = () => {
     const caption = target.caption.value;
     const site_url = target.site_url.value;
     if (isEditing) {
-      editWork({ media_url, caption, site_url, id })
+      editWork({ media_url, caption, site_url, id });
     } else {
-      postWork({ media_url, caption, site_url })
+      postWork({ media_url, caption, site_url });
     }
   }
   const postWork = ({ media_url, caption, site_url }: {

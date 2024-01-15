@@ -11,23 +11,21 @@ export const workApi = createApi({
                 try {
                     const querySnapshot = await getDocs(collection(db, "works"));
                     const works: any = [];
-
                     await Promise.all(
-                        querySnapshot.docs.map(async (doc) => {
+                        querySnapshot.docs.map((doc) => {
                             works.push({ ...doc.data(), id: doc.id });
                         })
                     );
-
                     return { data: works };
                 } catch (error: any) {
                     return { error: error };
                 }
             },
-
         }),
         getWorkById: builder.query<Work, { id: string }>({
             queryFn: async ({ id }) => {
                 try {
+                    
                     const docRef = doc(db, "works", id);
                     const workDoc = await getDoc(docRef);
                     if (workDoc.exists()) {

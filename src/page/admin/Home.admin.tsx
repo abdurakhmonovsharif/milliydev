@@ -16,21 +16,19 @@ import { Button, Input } from "@nextui-org/react";
 import { useTitle } from "../../helpers/useTitle";
 import { clearAll, setWorkState } from "../../redux/reducers/work.reducer";
 import { useGetWorkByCaptionQuery } from "../../redux/api/work.api";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { setUser } from "../../redux/reducers/user.reducer";
 const Admin = () => {
   useTitle("Admin");
-  const l_auth = localStorage.getItem("user_token");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { dark } = useSelector((state: RootState) => state.theme);
-  const { auth } = useSelector((state: RootState) => state.user);
   const { open } = useSelector((state: RootState) => state.sidebar);
   const workState = useSelector((state: RootState) => state.work);
   const [searchValue, setSearchValue] = useState("");
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   useEffect(() => {
-    location.pathname === "/admin" && navigate("/admin/works");
+    location.pathname === "/admin" && navigate("/admin/works/list");
     const dark_localstorege = localStorage.getItem("dark") || false;
     dispatch(
       setDark(
@@ -42,6 +40,21 @@ const Admin = () => {
       )
     );
   }, []);
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(setUser({
+          user: {
+            email: user.email
+          },
+          auth: true
+        }));
+      } else {
+        navigate("/login")
+      }
+    })
+  }, [])
   const toogleSidebar = () => {
     dispatch(setSidebarOpen(!open));
   };
@@ -49,7 +62,7 @@ const Admin = () => {
     dispatch(setDark(!dark));
     localStorage.setItem("dark", JSON.stringify(!dark));
   };
-  const { data: workData, isLoading, isFetching } = useGetWorkByCaptionQuery({ caption: searchValue }, { skip: searchValue == "" })
+  const { data: workData, isFetching } = useGetWorkByCaptionQuery({ caption: searchValue }, { skip: searchValue == "" })
   const handleSearch = (e: React.FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     if (value.trim() === "") {
@@ -76,7 +89,6 @@ const Admin = () => {
 
     setSearchTimeout(newTimeout);
   };
-
   useEffect(() => {
     dispatchWorkState()
   }, [isFetching]);

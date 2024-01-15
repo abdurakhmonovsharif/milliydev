@@ -1,14 +1,14 @@
 import { Button, CircularProgress, Image, Input } from "@nextui-org/react";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../../helpers/Icons";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/reducers/user.reducer";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "../../redux/store";
 import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { dbAuth } from "../../firebase-cfg";
 
 const Login = () => {
-  const user = useSelector((state: RootState) => state.user);
   const [isVisible, setIsVisible] = React.useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -16,19 +16,31 @@ const Login = () => {
   const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const target = e.target as typeof e.target & {
-      username: { value: string };
+      email: { value: string };
       password: { value: string };
     };
-    const username = target.username.value;
+    const email = target.email.value;
     const password = target.password.value;
-    const loginUser: User = {
-      username,
-      password,
-    };
     try {
-
-    } catch (err) {
-      console.error("Login Error:", err);
+     
+      signInWithEmailAndPassword(dbAuth, email, password)
+        .then(({ user }) => {
+          if (user) { 
+            dispatch(setUser({
+              user: {
+                email: user.email
+              },
+              auth: true
+            }));
+            navigate("/admin")
+          }
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          notify(errorMessage)
+        });
+    } catch (err: any) {
+      notify(err.message)
     }
   };
   const notify = (message: string) => toast.error(message);
@@ -46,12 +58,11 @@ const Login = () => {
         </div>
         <Input
           isClearable
-          type="text"
-          label="Username"
-          name="username"
+          type="email"
+          label="Email"
+          name="email"
           variant="bordered"
           placeholder="Enter your username"
-
           className="max-w-lg"
         />
         <Input

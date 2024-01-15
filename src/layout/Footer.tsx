@@ -3,7 +3,7 @@ import { C_icon } from "../helpers/Icons"
 
 const social_mediaArray = [
     {
-        link: "https://linkedin.com/abdurakhmonovsharif",
+        link: "https://linkedin.com/in/abdurakhmonovsharif",
         image_url: "/in.svg"
     },
     {
@@ -31,7 +31,7 @@ const Footer = () => {
                     one day at a time.</h1>
                 <div className="w-full flex items-center justify-center gap-x-4 ">
                     {
-                        social_mediaArray.map(item => <Link key={item.link} to={item.mail ? `mailto:${item.link}` : item.link}>
+                        social_mediaArray.map(item => <Link target="_blank" key={item.link} to={item.mail ? `mailto:${item.link}` : item.link}>
                             <div className="w-[45px] h-[45px] p-2 border  rounded-full">
                                 <img src={item.image_url} alt="#404" className="w-full h-full object-contain" />
                             </div>

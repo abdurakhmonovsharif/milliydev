@@ -1,20 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
+#root {
+  font-family: 'Lato', sans-serif;
 
-    background: #f1f1f1; 
-  }
-   
-  ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: #6E07F3; 
-  }  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555; 
-  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #6E07F3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

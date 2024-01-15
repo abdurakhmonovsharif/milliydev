@@ -7,6 +7,8 @@ import React from "react";
 import { setSidebarOpen } from "../../redux/reducers/sidebar.reducer";
 import IsMenuDrawer from "../../helpers/Drawwer";
 import { clearUser } from "../../redux/reducers/user.reducer";
+import { signOut } from "firebase/auth";
+import { dbAuth } from "../../firebase-cfg";
 const Sidebar = () => {
   const { open } = useSelector((state: RootState) => state.sidebar);
   const dispatch = useDispatch();
@@ -19,9 +21,14 @@ const Sidebar = () => {
     toogleSidebar()
   }
   const logOut = () => {
-    navigate("/login")
-    dispatch(clearUser())
-    localStorage.clear()
+    signOut(dbAuth).then(() => {
+      navigate("/login")
+      dispatch(clearUser())
+      localStorage.clear()
+    }).catch((error) => {
+      console.log(`Log out error: ${error.message}`);
+    });
+
   }
   return (
     <IsMenuDrawer open={open} toogleSidebar={toogleSidebar} >
@@ -35,7 +42,7 @@ const Sidebar = () => {
         <div className="h-[calc(100vh-70px)]  justify-between flex flex-col gap-y-3 pt-6">
           <div className="space-y-4 ">
             <Button onClick={() => navigator("/admin/works/create")} className="w-full text-white bg-global_purpe">
-              <span className="text-base"> <span className="text-xl">+</span> Create Work</span>
+              <span className="text-base"> <span className="text-xl font-bold">+</span> Create Work</span>
             </Button>
             <Button onClick={() => navigator("/admin/works/list")} className="w-full text-white bg-global_purpe">
               <span className="text-base">Works</span>

@@ -15,13 +15,15 @@ import WorksActions from "./page/admin/Works.create.admin";
 import WorksList from "./page/admin/Works.lists.admin";
 import Login from "./page/auth/Login";
 import React, { Suspense } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "./redux/store";
+import NotFound from "./page/NotFound";
 const Admin = React.lazy(() => import("./page/admin/Home.admin"))
 const Route = () => {
-  const user_token = localStorage.getItem("user_token");
-  const user = useSelector((state: RootState) => state.user);
   const routes = createBrowserRouter([
+    {
+      path: "*",
+      element: <NotFound />
+    }
+    ,
     {
       path: "/",
       element: <Home />,
@@ -49,9 +51,9 @@ const Route = () => {
     },
     {
       path: "/admin",
-      element: user.auth || user_token ? <Suspense fallback={"...Loading"}>
+      element: <Suspense fallback={"...Loading"}>
         <Admin />
-      </Suspense> : <Navigate to={'/login'} />,
+      </Suspense>,
       children: [
         {
           path: "/admin/works",
